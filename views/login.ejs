@@ -14,5 +14,15 @@
         <br>
         <button type="submit">Login</button>
     </form>
+
+    <script src="/socket.io/socket.io.js"></script>
+
 </body>
+<script>
+    const socket = io();
+
+    socket.on('notification', (data) => {
+        alert(`${data.type.toUpperCase()}: ${data.message}`);
+    });
+</script>
 </html>

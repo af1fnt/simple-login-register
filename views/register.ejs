@@ -14,5 +14,31 @@
         <br>
         <button type="submit">Register</button>
     </form>
+    <br>
+    <!-- Tombol Lupa Password -->
+    <p>Sudah punya akun? <a href="/auth/login">Login</a></p>
+    <p>Lupa password? <a href="/auth/forgot-password">Klik di sini</a></p>
 </body>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io(); // Inisialisasi koneksi ke server Socket.IO
+
+    // Debug koneksi
+    socket.on('connect', () => {
+        console.log('Connected to Socket.IO server with ID:', socket.id);
+    });
+
+    // Listen for notifications
+    socket.on('notification', (data) => {
+        alert(`${data.type.toUpperCase()}: ${data.message}`);
+    });
+
+    // Debug disconnection
+    socket.on('disconnect', () => {
+        console.log('Disconnected from server');
+    });
+</script>
+
+
 </html>

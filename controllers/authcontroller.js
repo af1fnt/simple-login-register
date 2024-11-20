@@ -14,6 +14,12 @@ exports.register = async (req, res) => {
         const newUser = await prisma.user.create({
             data: { email, password: hashedPassword },
         });
+
+        req.io.emit('notification', {
+            message: `Welcome, ${email}! Your account has been successfully created.`,
+            type: 'success',
+        });
+        
         res.status(201).redirect('/auth/login');
     } catch (error) {
         res.status(400).send('Error creating user');
@@ -46,11 +52,9 @@ exports.forgotPassword = async (req, res) => {
         const user = await prisma.user.findUnique({ where: { email } });
         if (!user) return res.status(404).send('User not found');
 
-        // Generate token
         const resetToken = crypto.randomBytes(32).toString('hex');
         const resetTokenExpires = new Date(Date.now() + 3600000); // 1 hour
 
-        // Save token in database
         await prisma.user.update({
             where: { email },
             data: {
@@ -59,7 +63,6 @@ exports.forgotPassword = async (req, res) => {
             },
         });
 
-        // Send reset link via email
         const resetUrl = `http://localhost:${process.env.PORT || 3000}/auth/reset-password/${resetToken}`;
         const transporter = nodemailer.createTransport({
             service: 'gmail',
@@ -105,7 +108,12 @@ exports.resetPassword = async (req, res) => {
             },
         });
 
-        res.status(200).send('Password reset successful');
+        req.io.emit('notification', {
+            message: `Password for ${user.email} has been successfully changed.`,
+            type: 'info',
+        });
+
+        res.status(200).send('Password reset successful, please go back to login page');
     } catch (error) {
         res.status(500).send('Error resetting password');
     }
